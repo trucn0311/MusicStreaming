@@ -9,8 +9,8 @@
 - Download all the dependencies in package.json:
      - npm install
 - To start the project:
-      - npm start
+     - npm start
 - The project will be host on : 
-      - localhost:3000
+     - localhost:3000
       
     
