@@ -8,7 +8,7 @@
      - git clone https://github.com/trucn0311/MusicStreaming.git
 - Download all the dependencies in package.json:
      - npm install
--To start the project:
+- To start the project:
       - npm start
 - The project will be host on : 
       - localhost:3000
