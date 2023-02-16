@@ -44,14 +44,14 @@ class RegisterForm(FlaskForm):
         existing_user_username = User.query.filter_by(
             username=username.data).first()
         if existing_user_username:
-            raise ValidationError(
+            raise ValueError(
                 'That username already exists. Please choose a different one.')
 
 
 class LoginForm(FlaskForm):
 
     username = StringField(validators=[
-                           InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Username"})
+                           InputRequired(), Length(min=5, max=20)], render_kw={"placeholder": "Username"})
 
     password = PasswordField(validators=[
                              InputRequired(), Length(min=5, max=20)], render_kw={"placeholder": "Password"})
@@ -70,14 +70,14 @@ def login():
         if user:
             if bcrypt.check_password_hash(user.password, form.password.data):
                 login_user(user)
-                return redirect(url_for('dashboard'))
+                return redirect(url_for('home'))
     return render_template('login.html', form=form)
 
 
-@app.route('/dashboard', methods=['GET', 'POST'])
+@app.route('/home', methods=['GET', 'POST'])
 @login_required
-def dashboard():
-    return render_template('dashboard.html' , name = current_user.username)
+def home():
+    return render_template('home.html' , name = current_user.username)
 
 
 @app.route('/logout', methods=['GET', 'POST'])
