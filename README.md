@@ -30,7 +30,7 @@ pip install -r dependencies.txt
 pip3 install -r dependencies.txt
 ```
 
-## Usage
+## Run
 
 ##### Windows:
 ```zsh
