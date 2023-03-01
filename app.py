@@ -17,7 +17,7 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
-#testing
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
@@ -78,6 +78,21 @@ def login():
 @login_required
 def home():
     return render_template('home.html' , name = current_user.username)
+
+@app.route('/playlist', methods=['GET', 'POST'])
+@login_required
+def playlist():
+    return render_template('playlist.html' , name = current_user.username)
+
+@app.route('/account', methods=['GET', 'POST'])
+@login_required
+def account():
+    return render_template('account.html' , name = current_user.username)
+
+@app.route('/setting', methods=['GET', 'POST'])
+@login_required
+def setting():
+    return render_template('setting.html' , name = current_user.username)
 
 
 @app.route('/logout', methods=['GET', 'POST'])

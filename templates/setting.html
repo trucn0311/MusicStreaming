@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+  {% include 'header.html' %}
+
+  <body>
+    {% include 'home.html' %}
+    <!-- ************************************************************************************************************************************************ -->
+    <!-- playlist-centent-start -->
+    <div class="fixed bg-white setting-content rounded-2 border border-2 ms-5">
+      Setting content goes here
+      <a href="">test</a>
+    </div>
+    <!--playlist content end****************************************************************************************************************************** -->
+  </body>
+
+  <style>
+    h1,
+    h2 {
+      font-family: "Climate Crisis", cursive;
+    }
+    .setting-content {
+      position: absolute;
+      top: 200px;
+      right: 60px;
+      height: 100%;
+      width: 65%;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+    .fixed {
+      position: fixed;
+    }
+  </style>
+</html>
