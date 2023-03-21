@@ -1,4 +1,4 @@
-## Python Flask Authentication
+## Python Flask
 
 ## Git
  - In your local development environment, go to a directory you want to store the project
