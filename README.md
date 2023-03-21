@@ -1,7 +1,7 @@
 ## Python Flask
 
 ## Git
- - In your local development environment, go to a directory you want to store the project
+ - In your local environment, go to a directory you want to store the project
  
    - Ex: cd DirectoryName
  
