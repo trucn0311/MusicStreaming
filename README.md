@@ -5,7 +5,7 @@
  
    - Ex: cd DirectoryName
  
- - Clone the project:
+ - Clone the project
     ```zsh
     git clone https://github.com/trucn0311/MusicStreaming.git 
     ```
