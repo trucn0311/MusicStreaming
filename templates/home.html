@@ -4,11 +4,12 @@
 
   <body>
     <div class="container-fluid text-center fixed">
-      <!--end of Navigation bar-->
-
       <div class="row">
         <div class="col-lg-3 bg-primary-subtle">
           <h2 class="text-uppercase fw-bolder p-2 mt-3 mb-5">Meloplay</h2>
+
+          <!-- ************************************************************************* -->
+          <!-- Navigation start  -->
           <nav class="d-flex flex-column align-items-center">
             <a
               class="text-uppercase text-decoration-none text-dark fw-bolder mb-5"
@@ -90,6 +91,8 @@
               >Logout</a
             >
           </nav>
+          <!-- Navigation end -->
+          <!-- ************************************************************************* -->
         </div>
         <div class="d-flex flex-column col-lg-9">
           <div class="d-flex bg-white">
@@ -111,17 +114,24 @@
               />
             </form>
           </div>
-
-          <!-- music player -->
+          <!-- ************************************************************************************** -->
+          <!-- ************************************************************************************** -->
+          <!-- ************************************************************************************** -->
+          <!-- music player section -->
           <div
             class="music-player bg-white row ms-5 border-top border-dark pt-3"
           >
             <img src="static/artist.jpg" class="me-5 col-lg-1" alt="song-img" />
+            <!-- ************************************************** -->
+            <!-- Song info -->
             <div class="song-info col-lg-2">
-              <p>Song</p>
-              <p>Artist</p>
+              <span id="song-title">Song</span>
+              <p id="artist-name">Artist</p>
             </div>
+            <!-- ************************************************** -->
+            <!-- Song buttons -->
             <div class="play-buttons m-3 col-6">
+              <!-- previous button -->
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="50"
@@ -136,6 +146,8 @@
                   d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"
                 />
               </svg>
+
+              <!--Play button -->
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="50"
@@ -143,6 +155,7 @@
                 fill="currentColor"
                 class="bi bi-play-circle"
                 viewBox="0 0 16 16"
+                id="play-button"
               >
                 <path
                   d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"
@@ -151,6 +164,26 @@
                   d="M6.271 5.055a.5.5 0 0 1 .52.038l3.5 2.5a.5.5 0 0 1 0 .814l-3.5 2.5A.5.5 0 0 1 6 10.5v-5a.5.5 0 0 1 .271-.445z"
                 />
               </svg>
+              <!--Stop button -->
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="50"
+                height="26"
+                fill="currentColor"
+                class="bi bi-pause-circle"
+                viewBox="0 0 16 16"
+                id="stop-button"
+                style="display: none"
+              >
+                <path
+                  d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"
+                />
+                <path
+                  d="M5 6.25a1.25 1.25 0 1 1 2.5 0v3.5a1.25 1.25 0 1 1-2.5 0v-3.5zm3.5 0a1.25 1.25 0 1 1 2.5 0v3.5a1.25 1.25 0 1 1-2.5 0v-3.5z"
+                />
+              </svg>
+
+              <!-- next button -->
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="50"
@@ -164,6 +197,7 @@
                   d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"
                 />
               </svg>
+              <span id="duration"></span>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="50"
@@ -179,6 +213,10 @@
               </svg>
             </div>
           </div>
+          <!-- ************************************************************************************** -->
+          <!-- ************************************************************************************** -->
+          <!-- ************************************************************************************** -->
+          <!-- music player section end -->
         </div>
       </div>
     </div>
@@ -187,6 +225,46 @@
       home content goes here
     </div>
     <!--body-content end ****************************************************************************************************************************************************************************************************************** -->
+    <!-- ************************************************************************* -->
+    <script>
+      $(document).ready(function () {
+        var audio = new Audio("/play_audio");
+        var playing = false;
+        var current_time = 0;
+        var durationSpan = document.getElementById("duration");
+        var artistSpan = document.getElementById("artist-name");
+
+        audio.addEventListener("loadedmetadata", () => {
+          const duration = audio.duration;
+          const minutes = Math.floor(duration / 60);
+          const seconds = Math.floor(duration % 60);
+
+          durationSpan.innerText = `${minutes}:${seconds
+            .toString()
+            .padStart(2, "0")}`;
+        });
+
+        $("#play-button").click(function () {
+          if (!playing) {
+            audio.currentTime = current_time;
+            audio.play();
+            playing = true;
+            $("#play-button").hide();
+            $("#stop-button").show();
+          }
+        });
+
+        $("#stop-button").click(function () {
+          if (playing) {
+            audio.pause();
+            current_time = audio.currentTime;
+            playing = false;
+            $("#play-button").show();
+            $("#stop-button").hide();
+          }
+        });
+      });
+    </script>
     <script src="main.js"></script>
   </body>
 
