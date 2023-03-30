@@ -2,11 +2,13 @@
 <html lang="en">
   {% include 'header.html' %}
 
-  <body>
+  <body id="body">
     <div class="container-fluid text-center fixed">
-      <div class="row">
+      <div class="row brightness">
         <div class="col-lg-3 bg-primary-subtle">
-          <h2 class="text-uppercase fw-bolder p-2 mt-3 mb-5">Meloplay</h2>
+          <h2 class="text-uppercase text-black fw-bolder p-2 mt-3 mb-5">
+            Meloplay
+          </h2>
 
           <!-- ************************************************************************* -->
           <!-- Navigation start  -->
@@ -94,18 +96,18 @@
           <!-- Navigation end -->
           <!-- ************************************************************************* -->
         </div>
-        <div class="d-flex flex-column col-lg-9">
-          <div class="d-flex bg-white">
+        <div class="d-flex flex-column col-lg-9 brightness">
+          <div class="d-flex">
             <div class="me-5 mt-2">
               <h4 class="ms-5">
                 Hello
                 <span class="user-name fw-semibold text-uppercase"
                   >{{name}}</span
-                >
+                >!
               </h4>
               <p class="ms-5">What music would you like to hear today?</p>
             </div>
-            <form class="mt-3 ms-5 ps-5 3" role="search">
+            <form class="mt-3 ms-5 ps-5" role="search">
               <input
                 class="form-control me-5 rounded-5 border border-3"
                 type="search"
@@ -113,14 +115,42 @@
                 aria-label="Search"
               />
             </form>
+            <svg
+              class="mt-4 ms-5"
+              id="light-mode"
+              xmlns="http://www.w3.org/2000/svg"
+              width="50"
+              height="26"
+              fill="currentColor"
+              class="bi bi-lightbulb"
+              viewBox="0 0 16 16"
+            >
+              <path
+                d="M2 6a6 6 0 1 1 10.174 4.31c-.203.196-.359.4-.453.619l-.762 1.769A.5.5 0 0 1 10.5 13a.5.5 0 0 1 0 1 .5.5 0 0 1 0 1l-.224.447a1 1 0 0 1-.894.553H6.618a1 1 0 0 1-.894-.553L5.5 15a.5.5 0 0 1 0-1 .5.5 0 0 1 0-1 .5.5 0 0 1-.46-.302l-.761-1.77a1.964 1.964 0 0 0-.453-.618A5.984 5.984 0 0 1 2 6zm6-5a5 5 0 0 0-3.479 8.592c.263.254.514.564.676.941L5.83 12h4.342l.632-1.467c.162-.377.413-.687.676-.941A5 5 0 0 0 8 1z"
+              />
+            </svg>
+            <svg
+              class="mt-4 ms-5"
+              id="dark-mode"
+              xmlns="http://www.w3.org/2000/svg"
+              width="50"
+              height="26"
+              fill="white"
+              class="bi bi-lightbulb-off"
+              viewBox="0 0 16 16"
+              style="display: none"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M2.23 4.35A6.004 6.004 0 0 0 2 6c0 1.691.7 3.22 1.826 4.31.203.196.359.4.453.619l.762 1.769A.5.5 0 0 0 5.5 13a.5.5 0 0 0 0 1 .5.5 0 0 0 0 1l.224.447a1 1 0 0 0 .894.553h2.764a1 1 0 0 0 .894-.553L10.5 15a.5.5 0 0 0 0-1 .5.5 0 0 0 0-1 .5.5 0 0 0 .288-.091L9.878 12H5.83l-.632-1.467a2.954 2.954 0 0 0-.676-.941 4.984 4.984 0 0 1-1.455-4.405l-.837-.836zm1.588-2.653.708.707a5 5 0 0 1 7.07 7.07l.707.707a6 6 0 0 0-8.484-8.484zm-2.172-.051a.5.5 0 0 1 .708 0l12 12a.5.5 0 0 1-.708.708l-12-12a.5.5 0 0 1 0-.708z"
+              />
+            </svg>
           </div>
           <!-- ************************************************************************************** -->
           <!-- ************************************************************************************** -->
           <!-- ************************************************************************************** -->
           <!-- music player section -->
-          <div
-            class="music-player bg-white row ms-5 border-top border-dark pt-3"
-          >
+          <div class="music-player row ms-5 border-top border-dark pt-3">
             <img src="static/artist.jpg" class="me-5 col-lg-1" alt="song-img" />
             <!-- ************************************************** -->
             <!-- Song info -->
@@ -221,51 +251,12 @@
       </div>
     </div>
     <!-- body-content start ************************************************************************************************************************************************************************ -->
-    <div class="fixed bg-white body-content rounded-2 border border-2 ms-5">
+    <div class="fixed brightness body-content rounded-2 border border-2 ms-5">
       home content goes here
     </div>
     <!--body-content end ****************************************************************************************************************************************************************************************************************** -->
     <!-- ************************************************************************* -->
-    <script>
-      $(document).ready(function () {
-        var audio = new Audio("/play_audio");
-        var playing = false;
-        var current_time = 0;
-        var durationSpan = document.getElementById("duration");
-        var artistSpan = document.getElementById("artist-name");
-
-        audio.addEventListener("loadedmetadata", () => {
-          const duration = audio.duration;
-          const minutes = Math.floor(duration / 60);
-          const seconds = Math.floor(duration % 60);
-
-          durationSpan.innerText = `${minutes}:${seconds
-            .toString()
-            .padStart(2, "0")}`;
-        });
-
-        $("#play-button").click(function () {
-          if (!playing) {
-            audio.currentTime = current_time;
-            audio.play();
-            playing = true;
-            $("#play-button").hide();
-            $("#stop-button").show();
-          }
-        });
-
-        $("#stop-button").click(function () {
-          if (playing) {
-            audio.pause();
-            current_time = audio.currentTime;
-            playing = false;
-            $("#play-button").show();
-            $("#stop-button").hide();
-          }
-        });
-      });
-    </script>
-    <script src="main.js"></script>
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
   </body>
 
   <style>
@@ -276,11 +267,12 @@
     .body-content {
       overflow-x: hidden;
       overflow-y: auto;
-      position: absolute;
+
       top: 200px;
       right: 60px;
       height: 100%;
       width: 65%;
+      display: block;
     }
     .music-player {
       position: relative;
