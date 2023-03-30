@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, redirect
+from flask import Flask, render_template, url_for, redirect, send_file
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
 from flask_wtf import FlaskForm
@@ -60,8 +60,12 @@ class LoginForm(FlaskForm):
 
     submit = SubmitField('Login')
 
-
-
+#  route that serves an audio file
+@app.route('/play_audio')
+def play_audio():
+    # Replace the file path below with the path to your audio file
+    audio_file = "static/That's What I Like.mp3"  
+    return send_file(audio_file, mimetype='audio/mp3')
 
 
 @app.route('/', methods=['GET', 'POST'])
