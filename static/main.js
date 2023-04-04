@@ -49,6 +49,7 @@ $(document).ready(function () {
     $(".brightness").css("transition", "background-color 0.5s ease");
     $(".brightness").css("background-color", "#161616");
     $(".brightness").css("color", "white");
+
     // save the user's preference to localStorage
     localStorage.setItem("dark-mode", true);
   });
@@ -60,5 +61,23 @@ $(document).ready(function () {
     $(".brightness").css("color", "#161616");
     // remove the user's preference from localStorage
     localStorage.removeItem("dark-mode");
+  });
+
+  var volume = 1; // default volume
+  var volumeSlider = document.getElementById("volume-slider");
+
+  // When the volume slider is changed, update the volume and set the audio volume
+  volumeSlider.addEventListener("change", function () {
+    volume = volumeSlider.value;
+    audio.volume = volume;
+  });
+
+  $("#more-info").click(function () {
+    if ($("#info-links").css("display") === "none") {
+      $("#info-links").css("display", "flex");
+      $("#info-links").css("flex-direction", "column");
+    } else {
+      $("#info-links").css("display", "none");
+    }
   });
 });

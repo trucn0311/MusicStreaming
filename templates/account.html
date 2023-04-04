@@ -5,10 +5,30 @@
     {% include 'home.html' %}
     <!-- ************************************************************************************************************************************************ -->
     <!-- playlist-centent-start -->
-    <div
-      class="fixed brightness profile-content rounded-2 border border-2 ms-5"
-    >
-      Profile content goes here
+    <div class="fixed brightness profile-content container-fluid text-white">
+      <div class="row p-5 mt-5 bg-secondary">
+        <div class="col-lg-5">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="150"
+            height="150"
+            fill="currentColor"
+            class="bi bi-person-circle"
+            viewBox="0 0 16 16"
+          >
+            <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
+            <path
+              fill-rule="evenodd"
+              d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"
+            />
+          </svg>
+        </div>
+        <div class="col-lg-7">
+          <p>Full Name: {{firstname}} {{lastname}}</p>
+          <p>Username: {{name}}</p>
+          <p>Region: {{country}}</p>
+        </div>
+      </div>
     </div>
     <!--playlist content end****************************************************************************************************************************** -->
   </body>
@@ -19,13 +39,15 @@
       font-family: "Climate Crisis", cursive;
     }
     .profile-content {
+      background-color: white;
       position: absolute;
-      top: 200px;
-      right: 60px;
-      height: 100%;
-      width: 65%;
+      top: 160px;
+      right: 20px;
+      height: calc(100% - 150px);
+      max-height: calc(100% - 150px);
+      width: 70%;
       overflow-x: hidden;
-      overflow-y: auto;
+      overflow-y: scroll;
     }
     .fixed {
       position: fixed;
