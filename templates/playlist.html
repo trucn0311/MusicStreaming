@@ -5,11 +5,10 @@
     {% include 'home.html' %}
     <!-- ************************************************************************************************************************************************ -->
     <!-- playlist-centent-start -->
-    <div
-      class="fixed brightness playlist-content rounded-2 border border-2 ms-5"
-    >
+    <div class="fixed brightness playlist-content">
       playlist content goes here
     </div>
+
     <!--playlist content end****************************************************************************************************************************** -->
   </body>
 
@@ -19,13 +18,15 @@
       font-family: "Climate Crisis", cursive;
     }
     .playlist-content {
+      background-color: white;
       position: absolute;
-      top: 200px;
-      right: 60px;
-      height: 100%;
-      width: 65%;
+      top: 160px;
+      right: 20px;
+      height: calc(100% - 150px);
+      max-height: calc(100% - 150px);
+      width: 70%;
       overflow-x: hidden;
-      overflow-y: auto;
+      overflow-y: scroll;
     }
     .fixed {
       position: fixed;
