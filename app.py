@@ -1,4 +1,5 @@
-from flask import Flask, render_template, url_for, redirect, send_file
+from flask import Flask, render_template, url_for, redirect, send_file, jsonify
+import requests
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
 from flask_wtf import FlaskForm
@@ -42,13 +43,13 @@ class User(db.Model, UserMixin):
 
     
 # user control section (delete)
-user_to_delete = User.query.filter_by(username='jarnell').first()
-if user_to_delete is not None:
-    db.session.delete(user_to_delete)
-    db.session.commit()
-    print(f"User with username {user_to_delete.username} has been deleted!")
-else:
-    print("User not found in the database.")
+# user_to_delete = User.query.filter_by(username='jarnell').first()
+# if user_to_delete is not None:
+#     db.session.delete(user_to_delete)
+#     db.session.commit()
+#     print(f"User with username {user_to_delete.username} has been deleted!")
+# else:
+#     print("User not found in the database.")
 
 class RegisterForm(FlaskForm):
 
@@ -90,6 +91,23 @@ def play_audio():
     # Replace the file path below with the path to your audio file
     audio_file = "static/That's What I Like.mp3"  
     return send_file(audio_file, mimetype='audio/mp3')
+
+
+# route for the page that will display the artist name and song name.
+@app.route('/song')
+def get_song_info():
+    # Send a GET request to the API endpoint
+    url = "http://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key=0ad0ac8cebf05b07eb961b5e492be718&artist=cher&track=believe&format=json"
+    response = requests.get(url)
+    data = response.json()
+
+    # Extract the artist name and song name from the parsed JSON data
+    artist_name = data['track']['artist']['name']
+    song_name = data['track']['name']
+
+    # Return the artist name and song name as a JSON response
+    return jsonify(artist_name=artist_name, song_name=song_name)
+
 
 
 @app.route('/', methods=['GET', 'POST'])
