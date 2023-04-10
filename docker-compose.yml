@@ -1,0 +1,18 @@
+version: '3.9'
+services:
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      FLASK_APP: app.py
+      FLASK_ENV: development
+      DB_HOST: meloplay-database.c0exmxclg0ce.us-east-1.rds.amazonaws.com
+      DB_PORT: 3306
+      DB_NAME: meloplaydatabase
+      DB_USERNAME: jennadmin
+      DB_PASSWORD: ${DB_PASSWORD}
+    command: flask run --host=0.0.0.0
+
+volumes:
+  db_data:
