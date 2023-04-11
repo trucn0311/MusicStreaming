@@ -86,27 +86,12 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Login')
 
 #  route that serves an audio file
-@app.route('/play_audio')
-def play_audio():
-    # Replace the file path below with the path to your audio file
-    audio_file = "static/That's What I Like.mp3"  
-    return send_file(audio_file, mimetype='audio/mp3')
+# @app.route('/play_audio')
+# def play_audio():
+#     # Replace the file path below with the path to your audio file
+#     audio_file = "static/That's What I Like.mp3"  
+#     return send_file(audio_file, mimetype='audio/mp3')
 
-
-# route for the page that will display the artist name and song name.
-@app.route('/song')
-def get_song_info():
-    # Send a GET request to the API endpoint
-    url = "http://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key=0ad0ac8cebf05b07eb961b5e492be718&artist=cher&track=believe&format=json"
-    response = requests.get(url)
-    data = response.json()
-
-    # Extract the artist name and song name from the parsed JSON data
-    artist_name = data['track']['artist']['name']
-    song_name = data['track']['name']
-
-    # Return the artist name and song name as a JSON response
-    return jsonify(artist_name=artist_name, song_name=song_name)
 
 
 

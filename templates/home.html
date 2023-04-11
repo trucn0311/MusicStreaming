@@ -2,17 +2,17 @@
 <html lang="en">
   {% include 'header.html' %}
 
-  <body id="body">
+  <body>
     <div class="container-fluid text-center fixed">
       <div class="row brightness">
-        <div class="col-lg-3 bg-primary-subtle">
+        <div class="col-lg-3 bg-primary-subtle nav-body">
           <h2 class="text-uppercase text-black fw-bolder p-2 mt-3 mb-5">
             Meloplay
           </h2>
 
           <!-- ************************************************************************* -->
           <!-- Navigation start  -->
-          <nav class="d-flex flex-column align-items-center">
+          <nav class="d-flex flex-column align-items-center nav-body">
             <a
               class="text-uppercase text-decoration-none text-dark fw-bolder mb-5"
               href="{{ url_for('home') }}"
@@ -280,7 +280,7 @@
       <div class="bg-dark rounded-3 p-5">
         <div class="row">
           <div class="col-lg-4 d-flex justify-content-start">Song</div>
-          <div class="col-lg-5 d-flex justify-content-end">
+          <div class="col-lg-4 d-flex justify-content-end me-lg-5">
             <p>Album</p>
           </div>
           <div class="col-lg-3 d-flex justify-content-end">
@@ -303,21 +303,7 @@
         </div>
         <hr />
 
-        <div id="top-tracks" class="row">
-          <div class="col-lg-4 d-flex flex-column justify-content-start">
-            <div id="song-name2"></div>
-            <div class="fs-6 fw-lighter" id="artist-name2"></div>
-          </div>
-
-          <div
-            class="col-lg-5 d-flex justify-content-end"
-            id="album-name"
-          ></div>
-          <div
-            class="col-lg-3 d-flex justify-content-end"
-            id="song-length"
-          ></div>
-        </div>
+        <div id="top-tracks" class="row"></div>
       </div>
       <br />
       <div class="bg-dark rounded-3 p-5">
@@ -342,6 +328,12 @@
   </body>
 
   <style>
+    .nav-body {
+      margin-bottom: 200px;
+    }
+    #body {
+      height: 100%;
+    }
     h1,
     h2 {
       font-family: "Climate Crisis", cursive;
