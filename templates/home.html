@@ -3,6 +3,7 @@
   {% include 'header.html' %}
 
   <body>
+    {% for song in songs %}
     <div class="container-fluid text-center fixed">
       <div class="row brightness">
         <div class="col-lg-3 bg-primary-subtle nav-body">
@@ -158,8 +159,12 @@
             <!-- ************************************************** -->
             <!-- Song info -->
             <div class="song-info col-lg-3">
-              <p id="song-name"></p>
-              <div id="artist-name"></div>
+              <div>{{ song.name }}</div>
+              <p class="file-path" data-file-path="{{ song.file_path }}">
+                {{ song.file_path }}
+              </p>
+
+              <div>{{ song.artist }}</div>
             </div>
             <!-- ************************************************** -->
             <!-- Song buttons -->
@@ -276,8 +281,22 @@
       </div>
     </div>
     <!-- body-content start ************************************************************************************************************************************************************************ -->
+
     <div class="fixed brightness body-content text-white">
-      <div class="bg-dark rounded-3 p-5">
+      <!-- database search form -->
+      <form action="{{ url_for('home') }}" method="get">
+        <label for="query">Search for a song:</label>
+        <input
+          type="text"
+          id="query"
+          name="query"
+          value="{{ request.args.get('query') }}"
+        />
+        <button type="submit">Search</button>
+      </form>
+      <!-- file path display -->
+
+      <!-- <div class="bg-dark rounded-3 p-5">
         <div class="row">
           <div class="col-lg-4 d-flex justify-content-start">Song</div>
           <div class="col-lg-4 d-flex justify-content-end me-lg-5">
@@ -304,7 +323,7 @@
         <hr />
 
         <div id="top-tracks" class="row"></div>
-      </div>
+      </div> -->
       <br />
       <div class="bg-dark rounded-3 p-5">
         <h3 class="fs-2 fw-bolder" id="artist-name3"></h3>
@@ -325,6 +344,7 @@
     <!-- ************************************************************************* -->
 
     <script src="{{ url_for('static', filename='main.js') }}"></script>
+    {% endfor %}
   </body>
 
   <style>
@@ -416,6 +436,9 @@
     #artist-list a {
       padding: 10px;
       text-decoration: none;
+    }
+    .file-path {
+      display: none;
     }
   </style>
 </html>

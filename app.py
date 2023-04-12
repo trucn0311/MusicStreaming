@@ -1,10 +1,9 @@
-from flask import Flask, render_template, url_for, redirect, send_file, jsonify
-import requests
+from flask import Flask, render_template, url_for, redirect, send_file, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
 from flask_wtf import FlaskForm
-from wtforms import StringField, DateField, PasswordField, SubmitField
-from wtforms.validators import InputRequired, Length, ValidationError
+from wtforms import StringField, PasswordField, SubmitField
+from wtforms.validators import InputRequired, Length
 from flask_bcrypt import Bcrypt
 from flask_migrate import Migrate
 
@@ -40,6 +39,27 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(80), nullable=False)
     country = db.Column(db.String(50), nullable=True) # add the country column
    
+class Song(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    artist = db.Column(db.String(255), nullable=False)
+    file_path = db.Column(db.String(255), nullable=False)
+
+db.create_all() 
+
+# insert songs
+# song = Song(name="Focus", artist='Ariana Grande', file_path="static/Focus.mp3")
+# db.session.add(song)
+# db.session.commit()
+
+
+# This is to remove
+# song_id = 3 # replace with the id of the song you want to delete
+# song = Song.query.get(song_id)  # load the song object by its id
+# if song is not None:
+#     db.session.delete(song)  # delete the song object
+#     db.session.commit()  # commit the changes to the database
+
 
     
 # user control section (delete)
@@ -86,11 +106,6 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Login')
 
 #  route that serves an audio file
-# @app.route('/play_audio')
-# def play_audio():
-#     # Replace the file path below with the path to your audio file
-#     audio_file = "static/That's What I Like.mp3"  
-#     return send_file(audio_file, mimetype='audio/mp3')
 
 
 
@@ -110,7 +125,10 @@ def login():
 @app.route('/home', methods=['GET', 'POST'])
 @login_required
 def home():
-    return render_template('home.html' , name = current_user.username, firstname = current_user.firstname,lastname= current_user.lastname, country = current_user.country)
+    search_query = request.args.get('query') 
+    songs = Song.query.filter(Song.name.ilike(f'%{search_query}%')).all()
+    return render_template('home.html' , name = current_user.username, firstname = current_user.firstname, lastname= current_user.lastname, country = current_user.country, songs=songs)
+
 
 @app.route('/playlist', methods=['GET', 'POST'])
 @login_required

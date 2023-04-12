@@ -3,7 +3,14 @@ $(document).ready(function () {
   var playing = false;
   var current_time = 0;
 
-  //   var artistSpan = document.getElementById("artist-name");
+  // var filePaths = document.querySelectorAll(".file-path");
+  // for (var i = 0; i < filePaths.length; i++) {
+  //   var filePath = filePaths[i].getAttribute("data-file-path");
+  //   const path = (document.getElementById(
+  //     "test-path"
+  //   ).innerText = `${filePath}`);
+  //   // do something with the file path
+  // }
 
   $("#play-button").click(function () {
     if (!playing) {
