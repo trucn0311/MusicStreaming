@@ -10,6 +10,7 @@ COPY dependencies.txt .
 # Install the dependencies in the container
 RUN pip install -r dependencies.txt
 
+
 # Copy the rest of the application files to the container
 COPY . .
 
