@@ -4,17 +4,19 @@
 
   <body id="body">
     <div class="container-fluid text-center fixed">
-      <div class="row brightness">
-        <div class="col-lg-3 bg-primary-subtle">
-          <h2 class="text-uppercase text-black fw-bolder p-2 mt-3 mb-5">
+      <div class="row body-main brightness">
+        <div class="col-lg-3 bg-dark">
+          <p
+            class="climate-font text-uppercase text-white fw-bolder p-2 mt-3 mb-5 fs-3"
+          >
             Meloplay
-          </h2>
+          </p>
 
           <!-- ************************************************************************* -->
           <!-- Navigation start  -->
           <nav class="d-flex flex-column align-items-center">
             <a
-              class="text-uppercase text-decoration-none text-dark fw-bolder mb-5"
+              class="text-uppercase text-decoration-none text-white fw-bolder mb-5 load-full-page"
               href="{{ url_for('home') }}"
               ><svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -31,9 +33,11 @@
             >
 
             <a
-              class="text-uppercase text-decoration-none text-dark fw-bolder mb-5 mt-5"
+              id="playlist-link"
+              class="text-uppercase text-decoration-none text-white fw-bolder mb-5 mt-5"
               href="{{ url_for('playlist') }}"
-              ><svg
+            >
+              <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="40"
                 height="25"
@@ -51,7 +55,7 @@
             >
 
             <a
-              class="text-uppercase text-decoration-none text-dark fw-bolder mb-5 mt-5"
+              class="text-uppercase text-decoration-none text-white fw-bolder mb-5 mt-5"
               href="{{ url_for('account') }}"
               ><svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -69,7 +73,7 @@
               >account</a
             >
             <a
-              class="text-uppercase text-decoration-none text-dark fw-bolder mb-5 mt-5"
+              class="text-uppercase text-decoration-none text-white fw-bolder mb-5 mt-5"
               href="{{ url_for('setting') }}"
               ><svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -88,7 +92,7 @@
               >setting</a
             >
             <a
-              class="btn btn-dark rounded-5 mb-5 mt-3"
+              class="btn btn-info rounded-5 mb-5 mt-3"
               href="{{url_for('logout')}}"
               >Logout</a
             >
@@ -98,26 +102,32 @@
         </div>
         <div class="d-flex flex-column col-lg-9 brightness">
           <div class="d-flex">
-            <div class="me-5 mt-2">
-              <h4 class="ms-5">
+            <div id="greeting" class="me-5 ms-5 mt-2">
+              <h4 class="">
                 Hello
                 <span class="user-name fw-semibold text-uppercase"
                   >{{firstname}} {{lastname}}</span
                 >!
               </h4>
-              <p class="ms-5">What music would you like to hear today?</p>
+              <p class="">What music would you like to hear today?</p>
             </div>
             <!-- Search bar -->
             <!-- ************************************************************************* -->
-
-            <form class="mt-3 ms-5 ps-5" role="search">
+            <form
+              class="mt-3 ms-5 ps-5"
+              method="POST"
+              action="{{ url_for('home') }}"
+            >
               <input
                 class="form-control me-5 rounded-5 border border-3"
-                type="search"
-                placeholder="Search"
-                aria-label="Search"
+                id="search-input"
+                type="text"
+                name="song_name"
+                placeholder="What's your jam?"
+                onkeydown="if (event.keyCode === 13) { this.form.submit(); return false; }"
               />
             </form>
+
             <svg
               class="mt-4 ms-5"
               id="light-mode"
@@ -153,19 +163,54 @@
           <!-- ************************************************************************************** -->
           <!-- ************************************************************************************** -->
           <!-- music player section -->
-          <div class="music-player row ms-3 border-top border-dark">
-            <img style="height: 60px; width: 90px" id="album-cover" />
+          <div class="music-player row ms-4 border-top border-dark">
+            <img
+              src="{{url_for('static', filename='eigth-note.jpg')}}"
+              style="height: 75px; width: 105px"
+              id="album-cover"
+            />
+
             <!-- ************************************************** -->
             <!-- Song info -->
             <div class="song-info col-lg-3">
               <p id="song-name"></p>
               <div id="artist-name"></div>
             </div>
+
             <!-- ************************************************** -->
             <!-- Song buttons -->
             <div class="play-buttons m-3 col-lg-7">
               <!-- previous button -->
+              <div class="slider-container me-5 row pb-3">
+                <div id="current-time" class="col-lg-3">00:00</div>
+                <input
+                  class="col-lg-4"
+                  type="range"
+                  min="1"
+                  max="100"
+                  value="0"
+                  id="seek-slider"
+                  onchange="seekTo()"
+                />
+                <div class="col-lg-3" id="song-length1">00:00</div>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="50"
+                  height="26"
+                  fill="currentColor"
+                  class="col-lg-2"
+                  class="bi bi-three-dots"
+                  id="more-info"
+                  viewBox="0 0 16 16"
+                >
+                  <path
+                    d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"
+                  />
+                </svg>
+              </div>
+
               <svg
+                class="prev-track"
                 xmlns="http://www.w3.org/2000/svg"
                 width="50"
                 height="26"
@@ -182,6 +227,7 @@
               <!-- ************************* -->
               <!--Play button -->
               <svg
+                class="playpause-track"
                 xmlns="http://www.w3.org/2000/svg"
                 width="50"
                 height="26"
@@ -219,6 +265,7 @@
 
               <!-- next button -->
               <svg
+                class="next-track"
                 xmlns="http://www.w3.org/2000/svg"
                 width="50"
                 height="26"
@@ -231,12 +278,13 @@
                   d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z"
                 />
               </svg>
-              <span class="pe-4" id="song-length2"></span>
+
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"
                 height="16"
                 fill="currentColor"
+                class="ms-5"
                 class="bi bi-megaphone"
                 viewBox="0 0 16 16"
               >
@@ -245,6 +293,7 @@
                 />
               </svg>
               <input
+                style="width: 80px; height: 5px"
                 type="range"
                 id="volume-slider"
                 min="0"
@@ -253,19 +302,6 @@
                 value="1"
               />
               <!-- More info button -->
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="50"
-                height="26"
-                fill="currentColor"
-                class="bi bi-three-dots"
-                id="more-info"
-                viewBox="0 0 16 16"
-              >
-                <path
-                  d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"
-                />
-              </svg>
             </div>
           </div>
           <!-- ************************************************************************************** -->
@@ -278,8 +314,70 @@
     <!-- body-content start ************************************************************************************************************************************************************************ -->
     <div class="fixed brightness body-content text-white">
       <div class="bg-dark rounded-3 p-5">
+        <!-- Avalaible Music from Database -->
+
         <div class="row">
-          <div class="col-lg-4 d-flex justify-content-start">Song</div>
+          <div class="col-lg-4 d-flex justify-content-start">
+            Available Song(s)
+          </div>
+          <div class="col-lg-5 d-flex justify-content-end">
+            <p>Album</p>
+          </div>
+          <div class="col-lg-3 d-flex justify-content-end">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              class="bi bi-clock"
+              viewBox="0 0 16 16"
+            >
+              <path
+                d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"
+              />
+              <path
+                d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"
+              />
+            </svg>
+          </div>
+        </div>
+        <hr />
+
+        <div class="row">
+          {% if song_path %}
+          <p id="song-path">
+            The file path for {{ song_name }} is {{ song_path }}
+          </p>
+          <p id="image-path">{{image_path}}</p>
+          <p id="song-name-path">{{song_name }}</p>
+          <p id="artist-path">{{ artist_name }}</p>
+
+          <div class="col-lg-4 d-flex flex-column justify-content-start">
+            <a class="text-decoration-none chosen-song" href="#" id="song-name"
+              >{{ song_name }}</a
+            >
+            <div class="fs-6 fw-lighter">{{ artist_name }}</div>
+          </div>
+          <div
+            class="col-lg-5 d-flex justify-content-end fw-lighter"
+            id="album-name"
+          ></div>
+          <div
+            class="col-lg-3 d-flex justify-content-end"
+            id="song-length2"
+          ></div>
+          {% endif %}
+        </div>
+      </div>
+      <br />
+
+      <div class="bg-dark rounded-3 p-5">
+        <!-- ************************************************************************************** -->
+        <!-- Music Metadata -->
+        <div class="row music-metadata">
+          <div class="col-lg-4 d-flex justify-content-start">
+            Artist's Top Song
+          </div>
           <div class="col-lg-5 d-flex justify-content-end">
             <p>Album</p>
           </div>
@@ -333,97 +431,11 @@
       <a class="text-decoration-none" href="">Add to Playlist</a>
       <a class="text-decoration-none" href="">Share</a>
     </div>
-    <div class="rounded-2" id="artist-list"></div>
+
     <!-- ************************************************************************* -->
     <!-- songs + artist API -->
     <!-- ************************************************************************* -->
 
     <script src="{{ url_for('static', filename='main.js') }}"></script>
   </body>
-
-  <style>
-    h1,
-    h2 {
-      font-family: "Climate Crisis", cursive;
-    }
-    .body-content {
-      background-color: white;
-      position: absolute;
-      top: 160px;
-      right: 20px;
-      height: calc(100% - 150px);
-      max-height: calc(100% - 150px);
-      width: 70%;
-      overflow-x: hidden;
-      overflow-y: scroll;
-      display: block;
-    }
-    .music-player {
-      width: 90%;
-    }
-    .play-buttons svg:hover {
-      fill: rgb(48, 168, 216);
-    }
-    .fixed {
-      position: fixed;
-    }
-    .user-name {
-      color: cornflowerblue;
-    }
-    nav {
-      position: relative;
-    }
-    #volume-slider {
-      -webkit-appearance: none;
-
-      height: 5px;
-      background: rgb(71, 71, 71);
-      outline: none;
-      opacity: 0.7;
-      -webkit-transition: 0.2s;
-      transition: opacity 0.2s;
-    }
-    #volume-slider::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      background: #81d3ec;
-      cursor: pointer;
-    }
-    #info-links {
-      position: absolute;
-      display: none;
-      height: 12%;
-      width: 10%;
-      top: 10%;
-      right: 2%;
-    }
-    #info-links a {
-      color: rgb(0, 0, 0);
-    }
-
-    #info-links a:hover {
-      color: rgb(48, 168, 216);
-    }
-    .album {
-      background-color: black;
-    }
-    .album:hover {
-      background-color: rgb(30, 30, 34);
-    }
-    #artist-list {
-      position: absolute;
-      background-color: white;
-      height: 40%;
-
-      right: 15%;
-      top: 10%;
-    }
-    #artist-list a {
-      padding: 10px;
-      text-decoration: none;
-    }
-  </style>
 </html>

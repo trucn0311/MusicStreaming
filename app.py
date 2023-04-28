@@ -1,9 +1,10 @@
-from flask import Flask, render_template, url_for, redirect, send_file, jsonify
-import requests
+
+from flask import Flask, render_template, url_for, redirect, send_file, jsonify, request
+from flask_socketio import SocketIO, emit
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
 from flask_wtf import FlaskForm
-from wtforms import StringField, DateField, PasswordField, SubmitField
+from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import InputRequired, Length, ValidationError
 from flask_bcrypt import Bcrypt
 from flask_migrate import Migrate
@@ -19,7 +20,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 bcrypt = Bcrypt(app)
-
+socketio = SocketIO(app)
 
 
 login_manager = LoginManager()
@@ -31,6 +32,18 @@ login_manager.login_view = 'login'
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+    
+song_files = [
+    "wave/Back 2 Boston.wav", "wave/Café rough.wav" , "wave/Call On.wav" , "wave/Mixed Signals.wav",
+    "wave/Reminiscing.wav" , "wave/Serenity.wav"
+    ] 
+current_song_index = 0
+
+song_art = [
+    "Artwork/Back 2 Boston.jpg", "Artwork/Café rough.jpg" , "Artwork/Call On.jpg" , "Artwork/Mixed Signals.jpg",
+    "Artwork/Reminiscing.jpg" , "Artwork/Serenity.jpg"
+    ] 
+
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
@@ -40,6 +53,29 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(80), nullable=False)
     country = db.Column(db.String(50), nullable=True) # add the country column
    
+class Song(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    artist = db.Column(db.String(255), nullable=False)
+    file_path = db.Column(db.String(255), nullable=False)
+    image_path = db.Column(db.String(255), nullable=True)
+    
+
+db.create_all() 
+
+# insert songs
+# song = Song(name="Kill Bill", artist='SZA', file_path="static/Kill Bill.mp3")
+# # song = Song(name="Serenity", artist='HashBrown', file_path="static/Serenity.wav", image_path="static/images/Serenity.JPG")
+# db.session.add(song)
+# db.session.commit()
+
+
+# This is to remove songs
+# song_id = 13 # replace with the id of the song you want to delete
+# song = Song.query.get(song_id)  # load the song object by its id
+# if song is not None:
+#     db.session.delete(song)  # delete the song object
+#     db.session.commit()  # commit the changes to the database
 
     
 # user control section (delete)
@@ -86,27 +122,27 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Login')
 
 #  route that serves an audio file
-@app.route('/play_audio')
-def play_audio():
-    # Replace the file path below with the path to your audio file
-    audio_file = "static/That's What I Like.mp3"  
-    return send_file(audio_file, mimetype='audio/mp3')
+# @app.route('/play_audio')
+# def play_audio():
+#     # Replace the file path below with the path to your audio file
+#     audio_file = "static/That's What I Like.mp3"  
+#     return send_file(audio_file, mimetype='audio/mp3')
 
 
-# route for the page that will display the artist name and song name.
-@app.route('/song')
-def get_song_info():
-    # Send a GET request to the API endpoint
-    url = "http://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key=0ad0ac8cebf05b07eb961b5e492be718&artist=cher&track=believe&format=json"
-    response = requests.get(url)
-    data = response.json()
+# # route for the page that will display the artist name and song name.
+# @app.route('/song')
+# def get_song_info():
+#     # Send a GET request to the API endpoint
+#     url = "http://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key=0ad0ac8cebf05b07eb961b5e492be718&artist=cher&track=believe&format=json"
+#     response = requests.get(url)
+#     data = response.json()
 
-    # Extract the artist name and song name from the parsed JSON data
-    artist_name = data['track']['artist']['name']
-    song_name = data['track']['name']
+#     # Extract the artist name and song name from the parsed JSON data
+#     artist_name = data['track']['artist']['name']
+#     song_name = data['track']['name']
 
-    # Return the artist name and song name as a JSON response
-    return jsonify(artist_name=artist_name, song_name=song_name)
+#     # Return the artist name and song name as a JSON response
+#     return jsonify(artist_name=artist_name, song_name=song_name)
 
 
 
@@ -122,10 +158,40 @@ def login():
     return render_template('login.html', form=form)
 
 
+
 @app.route('/home', methods=['GET', 'POST'])
 @login_required
 def home():
-    return render_template('home.html' , name = current_user.username, firstname = current_user.firstname,lastname= current_user.lastname, country = current_user.country)
+    song_path = None
+    artist_name = None
+    song_name = None
+    image_path = None
+    if request.method == 'POST':
+        song_name = request.form.get('song_name')
+        if song_name:
+            # Extract the first 3 words from the song name
+            first_3_words = ' '.join(song_name.split()[:3])
+            # Query the database for the song with the matching name
+            song = Song.query.filter(Song.name.ilike(f'%{first_3_words}%')).first()
+            if song:
+                song_path = url_for('static', filename=song.file_path)
+                artist_name = song.artist
+                song_name = song.name
+                image_path = song.image_path
+
+    return render_template('home.html', name = current_user.username, firstname = current_user.firstname,lastname= current_user.lastname, country = current_user.country, song_path=song_path, artist_name=artist_name,song_name=song_name, image_path=image_path)
+    
+@socketio.on('play_song')
+def handle_play_song(song_path):
+    # Code to play the song
+    emit('song_started')
+
+@socketio.on('stop_song')
+def handle_stop_song():
+    # Code to stop the song
+    emit('song_stopped')
+
+
 
 @app.route('/playlist', methods=['GET', 'POST'])
 @login_required
@@ -166,3 +232,5 @@ def register():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
+
