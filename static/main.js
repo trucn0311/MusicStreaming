@@ -1,41 +1,9 @@
 $(document).ready(function () {
-  var audio = new Audio("/play_audio");
-  var playing = false;
-  var current_time = 0;
-
-  // var filePaths = document.querySelectorAll(".file-path");
-  // for (var i = 0; i < filePaths.length; i++) {
-  //   var filePath = filePaths[i].getAttribute("data-file-path");
-  //   const path = (document.getElementById(
-  //     "test-path"
-  //   ).innerText = `${filePath}`);
-  //   // do something with the file path
-  // }
-
-  $("#play-button").click(function () {
-    if (!playing) {
-      audio.currentTime = current_time;
-      audio.play();
-      playing = true;
-      $("#play-button").hide();
-      $("#stop-button").show();
-    }
-  });
-
-  $("#stop-button").click(function () {
-    if (playing) {
-      audio.pause();
-      current_time = audio.currentTime;
-      playing = false;
-      $("#play-button").show();
-      $("#stop-button").hide();
-    }
-  });
   if (localStorage.getItem("dark-mode")) {
     // apply the dark mode styles to the relevant elements
     $("#light-mode").hide();
     $("#dark-mode").show();
-    $(".brightness").css("background-color", "#161616");
+    $(".brightness").css("background", "#161616");
     $(".brightness").css("color", "white");
   }
 
@@ -67,6 +35,13 @@ $(document).ready(function () {
     volume = volumeSlider.value;
     audio.volume = volume;
   });
+  const link = document.querySelector(".chosen-song");
+  link.addEventListener("click", chooseSong);
+
+  var audio = new Audio();
+  var playing = false;
+  var current_time = 0;
+  const socket = io.connect('{{ url_for("socketio") }}');
 
   $("#more-info").click(function () {
     if ($("#info-links").css("display") === "none") {
@@ -76,175 +51,213 @@ $(document).ready(function () {
       $("#info-links").css("display", "none");
     }
   });
-});
-// ***********************************************************************************************************************
-// Define variables for elements we'll be manipulating
-const searchForm = document.querySelector('form[role="search"]');
-const searchInput = searchForm.querySelector('input[type="search"]');
-const artistList = document.getElementById("artist-list");
 
-// Define a function to handle the form submission
-function handleSearch(event) {
-  event.preventDefault(); // prevent the default form submission behavior
-  $("#artist-list").css("display", "block");
+  // ***********************************************************************************************************************
 
-  // Get the user's search query from the input element
-  const query = searchInput.value.trim();
+  // get song's info
 
-  // Use the query to fetch artist suggestions from the Last.fm API
-  const url = `http://ws.audioscrobbler.com/2.0/?method=artist.search&api_key=0ad0ac8cebf05b07eb961b5e492be718&artist=${query}&format=json`;
-  fetch(url)
-    .then((response) => response.json())
-    .then((data) => {
-      // Extract the first three artist suggestions from the response
-      const artists = data.results.artistmatches.artist.slice(0, 5);
-      // Display the artist suggestions to the user
-      const suggestions = artists.map((artist) => artist.name);
-      const message = `Did you mean: ${suggestions.join(", ")}?`;
+  function chooseSong() {
+    var musicMetadata = document.querySelector(".music-metadata");
+    musicMetadata.style.display = "flex";
+    const text = $("#song-path").text();
+    const imagePath = $("#image-path").text();
+    const songName = $("#song-name-path").text();
+    const songPath = text.split("is")[1].trim().replace("/static", "");
+    var decodedFilePath = decodeURIComponent(songPath);
+    const songNameaa = decodedFilePath
+      .split("/")
+      .pop()
+      .replace(".mp3", "")
+      .trim();
+    var encodedSongName = encodeURIComponent(songNameaa);
+    const text2 = $("#artist-path").text();
+    var encodedArtistName = encodeURIComponent(text2);
 
-      // Create a clickable list of artist names
-      artistList.innerHTML = ""; // clear the previous list
-      artists.forEach((artist) => {
-        const artistLink = document.createElement("a");
-        artistLink.innerText = artist.name;
-        artistLink.href = "#";
-        artistLink.addEventListener("click", () => {
-          $("#artist-list").css("display", "none");
-          const chosenArtist = artist.name;
-          const encodedArtist = encodeURIComponent(chosenArtist);
-          const infoUrl = `http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&api_key=0ad0ac8cebf05b07eb961b5e492be718&artist=${encodedArtist}&format=json`;
+    const albumCover = document.getElementById("album-cover");
+    albumCover.src = imagePath;
+    const songTitle = document.getElementById("song-name");
+    songTitle.innerText = `${songName}`;
+    const artistName = document.getElementById("artist-name");
+    artistName.innerText = `${text2}`;
 
-          fetch(infoUrl)
-            .then((response) => response.json())
-            .then((data) => {
-              var artistName = encodeURIComponent(data.artist.name);
-              var songName = encodeURIComponent("Hotline Bling");
+    function seekTo() {
+      // get the slider element
+      var slider = document.getElementById("seek-slider");
 
-              //get song's info
-              $.getJSON(
-                `http://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key=0ad0ac8cebf05b07eb961b5e492be718&artist=${artistName}&track=${songName}&format=json`,
+      // calculate the new time value
+      var duration = audio.duration;
+      var time = (slider.value * duration) / 100;
 
-                function (data) {
-                  const track = data.track;
-                  const artistName = document.getElementById("artist-name");
-                  const songTitle = document.getElementById("song-name");
-                  const albumTitle = document.getElementById("album-name");
-                  const duration = document.getElementById("song-length");
-                  const albumCover = document.getElementById("album-cover");
+      // set the current time of the audio element
+      audio.currentTime = time;
 
-                  artistName.innerText = `${track.artist.name}`;
-                  songTitle.innerText = `${track.name}`;
-                  albumTitle.innerText = `${track.album.title}`;
-                  const durationInSeconds = Math.floor(track.duration / 1000); // convert milliseconds to seconds and round down
-                  const minutes = Math.floor(durationInSeconds / 60); // get the number of whole minutes
-                  const seconds = durationInSeconds % 60; // get the remaining seconds
-                  const formattedDuration = `${minutes
-                    .toString()
-                    .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
-                  duration.innerText = formattedDuration; // format as mm:ss with leading zeros
-                  duration2.innerText = formattedDuration; // format as mm:ss with leading zeros
+      // update the current time display
+      var currentTimeDiv = document.getElementById("current-time");
+      currentTimeDiv.innerHTML = formatTime(time);
+    }
 
-                  const albumImage = track.album.image.find(
-                    (image) => image.size === "extralarge"
-                  )["#text"];
-                  albumCover.src = albumImage;
-                }
-              );
+    function formatTime(time) {
+      // convert time in seconds to minutes:seconds format
+      var minutes = Math.floor(time / 60);
+      var seconds = Math.floor(time % 60);
+      return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+    }
 
-              //get artist bio
-              $.getJSON(
-                `http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=${artistName}&api_key=0ad0ac8cebf05b07eb961b5e492be718&format=json`,
-                function (data) {
-                  const artistName3 = document.getElementById("artist-name3");
-                  artistName3.innerText = `${data.artist.name}`;
-                  var bio = data.artist.bio.summary;
-                  bio = bio.replace(/Read more on Last.fm/g, "");
-                  $("#artist-bio").html(bio);
-                }
-              );
-
-              //get artist top songs
-              $.getJSON(
-                `http://ws.audioscrobbler.com/2.0/?method=artist.gettoptracks&artist=${artistName}&api_key=0ad0ac8cebf05b07eb961b5e492be718&format=json`,
-                function (data) {
-                  var tracks = data.toptracks.track.slice(0, 4);
-                  var html = "";
-                  $.each(tracks, function (index, track) {
-                    console.log(track);
-                    $.getJSON(
-                      `http://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key=0ad0ac8cebf05b07eb961b5e492be718&artist=${encodeURIComponent(
-                        track.artist.name
-                      )}&track=${encodeURIComponent(track.name)}&format=json`,
-                      function (data) {
-                        var duration = data.track.duration;
-                        var album = data.track.album.title;
-                        html +=
-                          '<div class=" row col-lg-12 track p-2 rounded-2 ">';
-                        html +=
-                          '<div class="col-lg-4 d-flex flex-column justify-content-start">';
-                        html += "<div>" + track.name + "</div>";
-                        html +=
-                          "<p class='ms-1 fw-lighter'>" +
-                          track.artist.name +
-                          "</p>";
-                        html += "</div>";
-                        html +=
-                          "<div class='col-lg-5 d-flex justify-content-end fw-lighter'>" +
-                          album +
-                          "</div>";
-                        const durationInSeconds = Math.floor(duration / 1000); // convert milliseconds to seconds and round down
-                        const minutes = Math.floor(durationInSeconds / 60); // get the number of whole minutes
-                        const seconds = durationInSeconds % 60; // get the remaining seconds
-                        const formattedDuration = `${minutes
-                          .toString()
-                          .padStart(2, "0")}:${seconds
-                          .toString()
-                          .padStart(2, "0")}`;
-                        html +=
-                          "<p class='col-lg-3 d-flex justify-content-end'>" +
-                          formattedDuration +
-                          "</p>";
-                        html += "</div>";
-                        $("#top-tracks").html(html);
-                      }
-                    );
-                  });
-                }
-              );
-
-              //get artist' top albums
-              $.getJSON(
-                `http://ws.audioscrobbler.com/2.0/?method=artist.gettopalbums&artist=${artistName}&api_key=0ad0ac8cebf05b07eb961b5e492be718&format=json`,
-                function (data) {
-                  var albums = data.topalbums.album.slice(0, 4);
-                  var html = "";
-                  $.each(albums, function (index, album) {
-                    html +=
-                      '<div class="text-center me-5 mb-5 col-lg-5 album p-3 rounded-2">';
-                    html +=
-                      '<img class="rounded-3 mb-2" src="' +
-                      album.image[2]["#text"] +
-                      '" />';
-                    html += "<h5>" + album.name + "</h5>";
-                    html += "<p>" + album.artist.name + "</p>";
-                    html += "</div>";
-                  });
-                  $("#top-albums").html(html);
-                }
-              );
-            })
-            .catch((error) => console.error(error));
+    function playSong() {
+      if (!playing) {
+        audio.src = decodedFilePath;
+        audio.load();
+        audio.currentTime = current_time;
+        audio.addEventListener("loadedmetadata", () => {
+          const duration = audio.duration;
+          const minutes = Math.floor(duration / 60)
+            .toString()
+            .padStart(2, "0");
+          const seconds = Math.floor(duration % 60)
+            .toString()
+            .padStart(2, "0");
+          $("#song-length1").text(`${minutes}:${seconds}`);
+          $("#song-length2").text(`${minutes}:${seconds}`);
         });
-        const listItem = document.createElement("p");
-        listItem.appendChild(artistLink);
-        artistList.appendChild(listItem);
+        audio
+          .play()
+          .then(() => {
+            playing = true;
+            $("#play-button").hide();
+            $("#stop-button").show();
+            socket.emit("play_song", decodedFilePath);
+          })
+          .catch((error) => {
+            console.error("Failed to play audio:", error);
+          });
+      }
+    }
+
+    $("#play-button").click(playSong);
+
+    $("#stop-button").click(function () {
+      audio.pause();
+      current_time = audio.currentTime;
+      playing = false;
+      $("#play-button").show();
+      $("#stop-button").hide();
+      socket.emit("stop_song");
+    });
+
+    // Trigger play button when the anchor tag is clicked
+    $(".chosen-song")
+      .on("click", function (event) {
+        event.preventDefault();
+        playSong();
+      })
+      .trigger("click");
+
+    // Update the slider when the audio is playing
+    audio.addEventListener("timeupdate", function () {
+      var slider = document.getElementById("seek-slider");
+      var value = (100 / audio.duration) * audio.currentTime;
+      slider.value = value;
+      var currentTimeDiv = document.getElementById("current-time");
+      currentTimeDiv.innerHTML = formatTime(audio.currentTime);
+    });
+
+    // Allow the user to seek to a specific point in the audio by clicking the slider
+    var slider = document.getElementById("seek-slider");
+    slider.addEventListener("click", function (event) {
+      var duration = audio.duration;
+      var clickX = event.clientX - slider.offsetLeft;
+      var percent = (clickX / slider.offsetWidth) * 100;
+      var time = (duration * percent) / 100;
+      audio.currentTime = time;
+    });
+
+    $.getJSON(
+      `http://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key=0ad0ac8cebf05b07eb961b5e492be718&artist=${encodedArtistName}&track=${encodedSongName}&format=json`,
+
+      function (data) {
+        const track = data.track;
+        const albumTitle = document.getElementById("album-name");
+        const albumCover = document.getElementById("album-cover");
+
+        albumTitle.innerText = `${track.album.title}`;
+        const albumImage = track.album.image.find(
+          (image) => image.size === "extralarge"
+        )?.["#text"];
+        albumCover.src = albumImage;
+      }
+    );
+    // //get artist top songs
+    $.getJSON(
+      `http://ws.audioscrobbler.com/2.0/?method=artist.gettoptracks&artist=${encodedArtistName}&api_key=0ad0ac8cebf05b07eb961b5e492be718&format=json`,
+      function (data) {
+        var tracks = data.toptracks.track.slice(0, 4);
+        var html = "";
+        $.each(tracks, function (index, track) {
+          $.getJSON(
+            `http://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key=0ad0ac8cebf05b07eb961b5e492be718&artist=${encodeURIComponent(
+              track.artist.name
+            )}&track=${encodeURIComponent(track.name)}&format=json`,
+            function (data) {
+              var duration = data.track.duration;
+              var album = data.track.album.title;
+              html += '<div class=" row col-lg-12 track p-2 rounded-2 ">';
+              html +=
+                '<div class="col-lg-4 d-flex flex-column justify-content-start">';
+              html += "<div>" + track.name + "</div>";
+              html +=
+                "<p class='ms-1 fw-lighter'>" + track.artist.name + "</p>";
+              html += "</div>";
+              html +=
+                "<div class='col-lg-5 d-flex justify-content-end fw-lighter'>" +
+                album +
+                "</div>";
+              const durationInSeconds = Math.floor(duration / 1000); // convert milliseconds to seconds and round down
+              const minutes = Math.floor(durationInSeconds / 60); // get the number of whole minutes
+              const seconds = durationInSeconds % 60; // get the remaining seconds
+              const formattedDuration = `${minutes
+                .toString()
+                .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+              html +=
+                "<p class='col-lg-3 d-flex justify-content-end'>" +
+                formattedDuration +
+                "</p>";
+              html += "</div>";
+              $("#top-tracks").html(html);
+            }
+          );
+        });
+      }
+    );
+
+    // get artist bio and top albums
+    $.when(
+      $.getJSON(
+        `http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=${encodedArtistName}&api_key=0ad0ac8cebf05b07eb961b5e492be718&format=json`
+      ),
+      $.getJSON(
+        `http://ws.audioscrobbler.com/2.0/?method=artist.gettopalbums&artist=${encodedArtistName}&api_key=0ad0ac8cebf05b07eb961b5e492be718&format=json`
+      )
+    ).done(function (infoData, topAlbumsData) {
+      const artistName3 = document.getElementById("artist-name3");
+      artistName3.innerText = `${infoData[0].artist.name}`;
+      var bio = infoData[0].artist.bio.summary;
+      bio = bio.replace(/Read more on Last.fm/g, "");
+      $("#artist-bio").html(bio);
+
+      var albums = topAlbumsData[0].topalbums.album.slice(0, 4);
+      var html = "";
+      $.each(albums, function (index, album) {
+        html +=
+          '<div class="text-center me-5 mb-5 col-lg-5 album p-3 rounded-2">';
+        html +=
+          '<img class="rounded-3 mb-2" src="' +
+          album.image[2]["#text"] +
+          '" />';
+        html += "<h5>" + album.name + "</h5>";
+        html += "<p>" + album.artist.name + "</p>";
+        html += "</div>";
       });
-    })
-    .catch((error) => console.error(error));
-}
-
-// Add an event listener to the search form to handle submissions
-searchForm.addEventListener("submit", handleSearch);
-
-// *********************************************************
-// replace with your desired artist name
+      $("#top-albums").html(html);
+    });
+  }
+});
