@@ -53,7 +53,6 @@ $(document).ready(function () {
   });
 
   // ***********************************************************************************************************************
-
   // get song's info
 
   function chooseSong() {
@@ -102,7 +101,7 @@ $(document).ready(function () {
       var seconds = Math.floor(time % 60);
       return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
     }
-
+    //playing song function
     function playSong() {
       if (!playing) {
         audio.src = decodedFilePath;
@@ -170,7 +169,7 @@ $(document).ready(function () {
       var time = (duration * percent) / 100;
       audio.currentTime = time;
     });
-
+    //get the album where the song is from and display it
     $.getJSON(
       `http://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key=0ad0ac8cebf05b07eb961b5e492be718&artist=${encodedArtistName}&track=${encodedSongName}&format=json`,
 
@@ -186,7 +185,7 @@ $(document).ready(function () {
         albumCover.src = albumImage;
       }
     );
-    // //get artist top songs
+    // //get artist(s) of the song and fetch their top songs
     $.getJSON(
       `http://ws.audioscrobbler.com/2.0/?method=artist.gettoptracks&artist=${encodedArtistName}&api_key=0ad0ac8cebf05b07eb961b5e492be718&format=json`,
       function (data) {
