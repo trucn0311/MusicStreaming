@@ -4,7 +4,7 @@
 
   <body id="body">
     <div class="container-fluid text-center fixed">
-      <div class="row brightness">
+      <div class="row body-main brightness">
         <div class="col-lg-3 bg-primary-subtle">
           <h2 class="text-uppercase text-black fw-bolder p-2 mt-3 mb-5">
             Meloplay
@@ -156,7 +156,11 @@
 
           <!--Change to display cover art give id=music-player-->
           <div class="music-player row ms-3 border-top border-dark">
-            <img id="track-art" src="static/Back 2 Boston.jpg" style="height: 60px; width: 90px" />
+            <img
+              id="track-art"
+              src="static/Back 2 Boston.jpg"
+              style="height: 60px; width: 90px"
+            />
             <!-- ************************************************** -->
             <!-- Song info -->
             <!-- Add the name , artist , and now playing divs    <img id="track-art" src="static/Back 2 Boston.jpg" class="me-5 col-lg-1" alt="song-img"/>-->
@@ -170,7 +174,7 @@
               <div class="now-playing">PLAYING x OF y</div>
               <div class="track-art"></div>
               <div class="track-name">Track Name</div>
-              <div class="track-artist"> Track Artist</div>
+              <div class="track-artist">Track Artist</div>
             </div>
 
             <!-- Slider goes here !!!!-->
@@ -179,14 +183,21 @@
             <!-- Song buttons -->
             <div class="play-buttons m-3 col-lg-7">
               <!-- previous button -->
-              <div class ="slider-container me-5 ">
+              <div class="slider-container me-5">
                 <div id="current-time">00:00</div>
-                <input type="range" min="1" max="100" value="0" id="seek-slider" onchange="seekTo()">
+                <input
+                  type="range"
+                  min="1"
+                  max="100"
+                  value="0"
+                  id="seek-slider"
+                  onchange="seekTo()"
+                />
                 <div id="total-duration">00:00</div>
-              </div> 
+              </div>
 
               <svg
-                class="prev-track" 
+                class="prev-track"
                 xmlns="http://www.w3.org/2000/svg"
                 width="50"
                 height="26"
@@ -376,6 +387,9 @@
     h1,
     h2 {
       font-family: "Climate Crisis", cursive;
+    }
+    .body-main {
+      height: 2000px;
     }
     .body-content {
       background-color: white;
