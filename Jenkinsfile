@@ -2,10 +2,6 @@ pipeline {
     agent any
 
     stages {
-    
-        agent { 
-            dockerfile true 
-        }
      
         stage ('Unit'){
             steps{
