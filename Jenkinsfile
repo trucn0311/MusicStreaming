@@ -7,26 +7,27 @@ pipeline {
             agent { 
                 dockerfile true 
             }
-            
-            stage ('Unit'){
-                steps{
-                    catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
-                        sh 'npm test'
-                    }
-                    catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
-                        sh 'npm -- --coverage'
-                    }
-                                
+            steps{
+                stage ('Unit'){
+                    steps{
+                        catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
+                            sh 'npm test'
+                        }
+                        catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
+                            sh 'npm -- --coverage'
+                        }
+                                    
 
-                    publishHTML (
-                        target: [
-                        allowMissing: false,
-                        alwaysLinkToLastBuild: false,
-                        keepAll: true,
-                        reportDir: 'coverage',
-                        reportFiles: 'index.html',
-                        reportName: "Coverage Report"
-                    ])
+                        publishHTML (
+                            target: [
+                            allowMissing: false,
+                            alwaysLinkToLastBuild: false,
+                            keepAll: true,
+                            reportDir: 'coverage',
+                            reportFiles: 'index.html',
+                            reportName: "Coverage Report"
+                        ])
+                    }
                 }
             }   
         }
