@@ -3,35 +3,32 @@ pipeline {
 
     stages {
     
-        stage('Verify'){
-            agent { 
-                dockerfile true 
-            }
+        agent { 
+            dockerfile true 
+        }
+     
+        stage ('Unit'){
             steps{
-                stage ('Unit'){
-                    steps{
-                        catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
-                            sh 'npm test'
-                        }
-                        catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
-                            sh 'npm -- --coverage'
-                        }
+                catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
+                    sh 'npm test'
+                }
+                catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
+                    sh 'npm -- --coverage'
+                }
                                     
 
-                        publishHTML (
-                            target: [
-                            allowMissing: false,
-                            alwaysLinkToLastBuild: false,
-                            keepAll: true,
-                            reportDir: 'coverage',
-                            reportFiles: 'index.html',
-                            reportName: "Coverage Report"
-                        ])
-                    }
-                }
-            }   
+                publishHTML (
+                    target: [
+                    allowMissing: false,
+                    alwaysLinkToLastBuild: false,
+                    keepAll: true,
+                    reportDir: 'coverage',
+                    reportFiles: 'index.html',
+                    reportName: "Coverage Report"
+                ])
+            }
         }
-        
+           
         stage('Build') {
             when {
                 branch 'master'
