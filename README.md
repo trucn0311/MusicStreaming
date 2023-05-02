@@ -5,7 +5,7 @@
  
    - Ex: cd DirectoryName
  
- - Clone the project:
+ - Clone the project
     ```zsh
     git clone https://github.com/trucn0311/MusicStreaming.git 
     ```
@@ -46,7 +46,6 @@ python3 app.py
 http://127.0.0.1:5000
 ```
 
-## Begin working
- - Checkout : https://www.freecodecamp.org/news/how-to-use-git-and-github-in-a-team-like-a-pro/
+
 
 

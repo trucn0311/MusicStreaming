@@ -1,18 +1,25 @@
-from flask import Flask, render_template, url_for, redirect
+from flask import Flask, render_template, url_for, redirect, send_file, jsonify
+import requests
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField
+from wtforms import StringField, DateField, PasswordField, SubmitField
 from wtforms.validators import InputRequired, Length, ValidationError
 from flask_bcrypt import Bcrypt
+from flask_migrate import Migrate
+
 
 ##The following block contains the app  
 
+
 app = Flask(__name__)
-db = SQLAlchemy(app)
-bcrypt = Bcrypt(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SECRET_KEY'] = 'thisisasecretkey'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
+bcrypt = Bcrypt(app)
+
 
 
 login_manager = LoginManager()
@@ -28,17 +35,35 @@ def load_user(user_id):
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), nullable=False, unique=True)
+    firstname = db.Column(db.String(50), nullable=True) # add the country column
+    lastname = db.Column(db.String(50), nullable=True) # add the country column
     password = db.Column(db.String(80), nullable=False)
+    country = db.Column(db.String(50), nullable=True) # add the country column
    
 
+    
+# user control section (delete)
+# user_to_delete = User.query.filter_by(username='jarnell').first()
+# if user_to_delete is not None:
+#     db.session.delete(user_to_delete)
+#     db.session.commit()
+#     print(f"User with username {user_to_delete.username} has been deleted!")
+# else:
+#     print("User not found in the database.")
 
 class RegisterForm(FlaskForm):
 
     username = StringField(validators=[
                            InputRequired(), Length(min=5, max=20)], render_kw={"placeholder": "Username"})
 
+    firstname = StringField(validators=[InputRequired(), Length(max=50)], render_kw={"placeholder": "First Name"})
+
+    lastname = StringField(validators=[InputRequired(), Length(max=50)], render_kw={"placeholder": "Last Name"})
+
     password = PasswordField(validators=[
                              InputRequired(), Length(min=5, max=20)], render_kw={"placeholder": "Password"})
+   
+    country = StringField(validators=[InputRequired(), Length(max=50)], render_kw={"placeholder": "Country"})
 
     submit = SubmitField('Register')
 
@@ -48,7 +73,7 @@ class RegisterForm(FlaskForm):
         if existing_user_username:
             raise ValueError(
                 'That username already exists. Please choose a different one.')
-
+        
 
 class LoginForm(FlaskForm):
 
@@ -61,6 +86,24 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Login')
 
 
+#  route that serves an audio file
+
+
+
+# route for the page that will display the artist name and song name.
+@app.route('/song')
+def get_song_info():
+    # Send a GET request to the API endpoint
+    url = "http://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key=0ad0ac8cebf05b07eb961b5e492be718&artist=cher&track=believe&format=json"
+    response = requests.get(url)
+    data = response.json()
+
+    # Extract the artist name and song name from the parsed JSON data
+    artist_name = data['track']['artist']['name']
+    song_name = data['track']['name']
+
+    # Return the artist name and song name as a JSON response
+    return jsonify(artist_name=artist_name, song_name=song_name)
 
 
 
@@ -79,22 +122,22 @@ def login():
 @app.route('/home', methods=['GET', 'POST'])
 @login_required
 def home():
-    return render_template('home.html' , name = current_user.username)
+    return render_template('home.html' , name = current_user.username, firstname = current_user.firstname,lastname= current_user.lastname, country = current_user.country)
 
 @app.route('/playlist', methods=['GET', 'POST'])
 @login_required
 def playlist():
-    return render_template('playlist.html' , name = current_user.username)
+    return render_template('playlist.html' , name = current_user.username, firstname = current_user.firstname,lastname= current_user.lastname, country = current_user.country)
 
 @app.route('/account', methods=['GET', 'POST'])
 @login_required
 def account():
-    return render_template('account.html' , name = current_user.username)
+    return render_template('account.html' , name = current_user.username, firstname = current_user.firstname,lastname= current_user.lastname, country = current_user.country)
 
 @app.route('/setting', methods=['GET', 'POST'])
 @login_required
 def setting():
-    return render_template('setting.html' , name = current_user.username)
+    return render_template('setting.html' , name = current_user.username, firstname = current_user.firstname,lastname= current_user.lastname, country = current_user.country)
 
 
 @app.route('/logout', methods=['GET', 'POST'])
@@ -110,7 +153,7 @@ def register():
 
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data)
-        new_user = User(username=form.username.data, password=hashed_password)
+        new_user = User(username=form.username.data, firstname = form.firstname.data, lastname = form.lastname.data, password=hashed_password, country = form.country.data)
         db.session.add(new_user)
         db.session.commit()
         return redirect(url_for('login'))

@@ -8,12 +8,11 @@ let next_Track = document.querySelector('.next-track');
 let prev_Track = document.querySelector('.prev-track');
 
 let seek_slider = document.getElementById('seek-slider');
-let volume_slider = document.querySelector('.volume_slider');
+let volume_slider = document.getElementById('volume-slider');
 
 let currentTime = document.getElementById('current-time');
 let duration = document.getElementById('total-duration');
 
-//let wave = document.getElementById('wave');
 let currentTrack = document.createElement('audio');
 document.body.appendChild(currentTrack);
 
@@ -21,7 +20,6 @@ let playButton = document.getElementById('play-button');
 
 let index = 0;
 let isPlaying = false;
-let isRandom = false;
 let updateTime;
 
 
@@ -102,8 +100,6 @@ function loadTrack(index){
 
 }
 
-
-
 function reset (){
     if(currentTime === null){
     currentTime.textContent = "00:00";
@@ -112,47 +108,32 @@ function reset (){
     }
 }
 
-function randomTrack (){
-    random ? pauseRandom() : playRandom();
-}
 
-function playRandom(){
-    israndom = true;
-    //randomIcon.classList.add('randomActive');
-}
-
-function pauseRandom(){
-    random = false;
-    //randomIcon.classList.remove('randomActive');
-}
 function repeatTrack(){
     let currentTrack = index;
     loadTrack(currentTrack);
     playTrack();
 }
+
 function playPauseTrack(){
     console.log('PlayPause Button Clicked');
     isPlaying ? pauseTrack() : playTrack();
 }
 
 
-
 function playTrack(){
     console.log(`Attempting to play ${currentTrack.src}`);
     currentTrack.play();
-    isPlaying = true;
-    trackArt.classList.add('rotate');
-    //wave.classList.add('loader');
+    isPlaying = true;;
     play_pause.classList.remove('bi-play-circle');
     play_pause.classList.add('bi-pause-circle');
 
 }
 
 function pauseTrack(){
+    
     currentTrack.pause();
     isPlaying = false;
-    trackArt.classList.remove('rotate');
-   // wave.classList.remove('loader');
     play_pause.classList.remove('bi-pause-circle');
     play_pause.classList.add('bi-play-circle');
 }
@@ -184,7 +165,9 @@ function seekTo(){
     currentTrack.currentTime = seekTo;
 }
 function setVolume(){
-    currentTrack.volume = volume_slider.value / 100;
+   
+    currentTrack.volume = volume_slider.value / 2;
+    
 }
 
 function seekUpdate(){

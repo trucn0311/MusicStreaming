@@ -3,9 +3,6 @@ import wave
 import numpy as np
 import struct
 
-
-#***Not the final version this code will be refactored 
-
 #create the socket 
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -33,14 +30,16 @@ while True:
     sample_rate = wave_file.getframerate()
     audioArray = np.frombuffer(songFrames, dtype=np.int16)
 
-    
+    print(sample_rate)
 
     #this is for functionality testing 
     print('Connected successfully to the server socket!!! Fetching Data Now')
     message = str(sample_rate).encode()
     client_socket.sendall(message)
-  
-    
+    print(len(audioArray))
+
+    print(len(songFrames))
+
     chunkSize = 1024
 
     for index in range(0, len(audioArray) , chunkSize):
