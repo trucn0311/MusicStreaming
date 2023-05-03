@@ -30,7 +30,7 @@ pipeline {
                 branch 'master'
             }
             steps {
-                sh "docker build -t streaming_jest_test:${GIT_BRANCH}_${GIT_COMMIT} ."
+                sh "ssh-agent bash -c 'ssh-add /Users/nelly/.ssh/id_rsa && git clone -c core.sshCommand=\"ssh -o StrictHostKeyChecking=no\" git@github.com:trucn0311/MusicStreaming.git && cd MusicStreaming && docker build -t streaming_jest_test:${GIT_BRANCH}_${GIT_COMMIT} ."
                 echo 'docker push ...'
             }
         }
